@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Call Management System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0B1220;
+    --navy-2:#101A30;
+    --navy-3:#182444;
+    --blue:#2454FF;
+    --blue-dark:#173BCB;
+    --blue-light:#EAF0FF;
+    --bg:#F3F6FC;
+    --card:#FFFFFF;
+    --border:#E3E8F2;
+    --text:#0F172A;
+    --text-soft:#64708A;
+    --text-faint:#96A1B8;
+    --green:#0E9F6E;
+    --green-bg:#E7F8F1;
+    --amber:#D97706;
+    --amber-bg:#FEF3E2;
+    --red:#DC2626;
+    --red-bg:#FDECEC;
+    --violet:#6D5BD0;
+    --violet-bg:#EFEBFC;
+    --radius:14px;
+    --radius-sm:9px;
+    --shadow:0 1px 2px rgba(15,23,42,0.04), 0 8px 24px -12px rgba(15,23,42,0.12);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.brand,.nav-item,.stat-label,.section-title{font-family:'Manrope',system-ui,sans-serif;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  /* ---------- Layout ---------- */
+  .app{display:flex; min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{
+    width:250px; flex-shrink:0; background:linear-gradient(180deg,var(--navy) 0%, var(--navy-2) 100%);
+    color:#fff; display:flex; flex-direction:column; padding:22px 16px; position:sticky; top:0; height:100vh;
+  }
+  .brand{display:flex; align-items:center; gap:10px; padding:6px 10px 26px 10px;}
+  .brand-mark{
+    width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--blue),#5B7CFF);
+    display:flex; align-items:center; justify-content:center; font-size:17px; flex-shrink:0;
+    box-shadow:0 4px 14px rgba(36,84,255,0.45);
+  }
+  .brand-text{font-weight:800; font-size:15.5px; line-height:1.2;}
+  .brand-text span{display:block; font-family:'Inter'; font-weight:500; font-size:11px; color:#8892AC; margin-top:1px;}
+
+  .nav{display:flex; flex-direction:column; gap:3px; margin-top:8px;}
+  .nav-item{
+    display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; cursor:pointer;
+    color:#B7C0DA; font-weight:600; font-size:13.5px; border:none; background:none; text-align:left; width:100%;
+    transition:background .15s, color .15s;
+  }
+  .nav-item .ico{width:18px; text-align:center; font-size:15px;}
+  .nav-item:hover{background:rgba(255,255,255,0.06); color:#fff;}
+  .nav-item.active{background:var(--blue); color:#fff; box-shadow:0 4px 14px rgba(36,84,255,0.35);}
+  .nav-item .badge{
+    margin-left:auto; background:rgba(255,255,255,0.14); color:#fff; font-size:10.5px; font-weight:700;
+    padding:1px 7px; border-radius:20px; font-family:'JetBrains Mono';
+  }
+  .nav-item.active .badge{background:rgba(255,255,255,0.28);}
+
+  .sidebar-foot{margin-top:auto; padding:14px 10px 4px 10px; border-top:1px solid rgba(255,255,255,0.08);}
+  .sidebar-foot-btn{
+    width:100%; padding:10px 12px; border-radius:10px; border:1px dashed rgba(255,255,255,0.22);
+    background:none; color:#9DA8C4; font-weight:600; font-size:12.5px; cursor:pointer; font-family:'Inter';
+  }
+  .sidebar-foot-btn:hover{color:#fff; border-color:rgba(255,255,255,0.4);}
+
+  /* Main */
+  .main{flex:1; padding:26px 34px 60px 34px; max-width:1280px;}
+  .topbar{display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:22px; gap:16px; flex-wrap:wrap;}
+  .page-title{font-size:22px; font-weight:800; margin:0;}
+  .page-sub{color:var(--text-soft); font-size:13.5px; margin-top:4px;}
+  .topbar-actions{display:flex; gap:10px;}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:7px; padding:10px 16px; border-radius:10px; border:1px solid transparent;
+    font-weight:700; font-size:13px; cursor:pointer; font-family:'Inter'; white-space:nowrap; transition:transform .05s, box-shadow .15s, background .15s;
+  }
+  .btn:active{transform:translateY(1px);}
+  .btn-primary{background:var(--blue); color:#fff; box-shadow:0 6px 16px -4px rgba(36,84,255,0.55);}
+  .btn-primary:hover{background:var(--blue-dark);}
+  .btn-outline{background:#fff; color:var(--text); border-color:var(--border);}
+  .btn-outline:hover{border-color:var(--blue); color:var(--blue);}
+  .btn-soft{background:var(--blue-light); color:var(--blue-dark);}
+  .btn-soft:hover{background:#DCE6FF;}
+  .btn-danger-soft{background:var(--red-bg); color:var(--red);}
+  .btn-danger-soft:hover{background:#FADCDC;}
+  .btn-green-soft{background:var(--green-bg); color:var(--green);}
+  .btn-sm{padding:6px 11px; font-size:12px; border-radius:8px;}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  /* Sections */
+  .section{display:none;}
+  .section.active{display:block; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+
+  /* Stat cards */
+  .stats-grid{display:grid; grid-template-columns:repeat(6,1fr); gap:14px; margin-bottom:22px;}
+  .stat-card{
+    background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:16px 16px 14px 16px;
+    box-shadow:var(--shadow);
+  }
+  .stat-label{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--text-soft); font-weight:700;}
+  .stat-value{font-size:26px; font-weight:800; margin-top:6px; font-family:'JetBrains Mono';}
+  .stat-card.accent-blue .stat-value{color:var(--blue-dark);}
+  .stat-card.accent-amber .stat-value{color:var(--amber);}
+  .stat-card.accent-green .stat-value{color:var(--green);}
+  .stat-card.accent-red .stat-value{color:var(--red);}
+  .stat-card.accent-violet .stat-value{color:var(--violet);}
+
+  /* Cards / panels */
+  .panel{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 20px 22px 20px; margin-bottom:20px;}
+  .panel-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; gap:10px; flex-wrap:wrap;}
+  .section-title{font-size:15px; font-weight:800; margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .section-title .tag{
+    font-family:'JetBrains Mono'; font-size:10px; font-weight:600; background:var(--blue-light); color:var(--blue-dark);
+    padding:2px 8px; border-radius:20px; letter-spacing:.02em;
+  }
+  .panel-desc{color:var(--text-soft); font-size:12.5px; margin:0 0 14px 0;}
+
+  .two-col{display:grid; grid-template-columns:1.3fr 1fr; gap:20px; align-items:start;}
+
+  /* Queue visualization (FIFO chain) */
+  .queue-track{display:flex; align-items:center; gap:0; overflow-x:auto; padding:10px 2px 14px 2px;}
+  .queue-chip{
+    flex-shrink:0; min-width:132px; background:var(--blue-light); border:1px solid #D6E2FF; border-radius:12px;
+    padding:10px 12px; position:relative;
+  }
+  .queue-chip .qc-name{font-weight:700; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .queue-chip .qc-phone{font-family:'JetBrains Mono'; font-size:11px; color:var(--blue-dark); margin-top:2px;}
+  .queue-chip .qc-pos{
+    position:absolute; top:-8px; left:-8px; background:var(--blue); color:#fff; font-size:10px; font-weight:800;
+    width:19px; height:19px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono';
+  }
+  .queue-arrow{flex-shrink:0; width:26px; text-align:center; color:var(--text-faint); font-size:15px;}
+  .queue-empty, .stack-empty, .table-empty{color:var(--text-faint); font-size:13px; padding:22px 4px; text-align:center;}
+
+  /* Stack visualization (LIFO tower) */
+  .stack-tower{display:flex; flex-direction:column-reverse; gap:8px; padding:4px 2px;}
+  .stack-card{
+    border-radius:10px; padding:9px 12px; border:1px solid var(--border); background:#FAFBFF;
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+  }
+  .stack-card:last-child{ /* topmost (most recent) since column-reverse */
+    background:var(--violet-bg); border-color:#DCD4F7;
+  }
+  .stack-card .sc-info{min-width:0;}
+  .stack-card .sc-name{font-weight:700; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .stack-card .sc-meta{font-family:'JetBrains Mono'; font-size:10.5px; color:var(--text-soft); margin-top:1px;}
+  .status-pill{font-size:10px; font-weight:800; padding:3px 9px; border-radius:20px; text-transform:uppercase; letter-spacing:.03em; flex-shrink:0;}
+  .status-Answered{background:var(--green-bg); color:var(--green);}
+  .status-Missed{background:var(--amber-bg); color:var(--amber);}
+  .status-Rejected{background:var(--red-bg); color:var(--red);}
+  .status-Waiting{background:var(--blue-light); color:var(--blue-dark);}
+  .status-Ongoing{background:var(--violet-bg); color:var(--violet);}
+
+  /* Ongoing banner */
+  .ongoing-list{display:flex; flex-direction:column; gap:10px;}
+  .ongoing-card{
+    display:flex; align-items:center; justify-content:space-between; gap:14px; background:linear-gradient(90deg,#F3F0FF,#FBFAFF);
+    border:1px solid #E1D9F9; border-radius:12px; padding:12px 16px;
+  }
+  .ongoing-left{display:flex; align-items:center; gap:12px;}
+  .pulse-dot{width:9px; height:9px; border-radius:50%; background:var(--violet); box-shadow:0 0 0 rgba(109,91,208,.5); animation:pulse 1.6s infinite;}
+  @keyframes pulse{
+    0%{box-shadow:0 0 0 0 rgba(109,91,208,.45);}
+    70%{box-shadow:0 0 0 8px rgba(109,91,208,0);}
+    100%{box-shadow:0 0 0 0 rgba(109,91,208,0);}
+  }
+  .ongoing-name{font-weight:700; font-size:13.5px;}
+  .ongoing-meta{font-family:'JetBrains Mono'; font-size:11.5px; color:var(--text-soft);}
+
+  /* Table */
+  .table-wrap{overflow-x:auto;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  thead th{
+    text-align:left; font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--text-soft);
+    padding:0 12px 10px 12px; border-bottom:1px solid var(--border); font-weight:700;
+  }
+  tbody td{padding:12px; border-bottom:1px solid #EEF1F7; vertical-align:middle;}
+  tbody tr:hover{background:#FAFBFF;}
+  td.name-cell{font-weight:600;}
+  td.mono-cell{font-family:'JetBrains Mono'; font-size:12.5px; color:var(--text-soft);}
+  .type-pill{font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:6px;}
+  .type-Incoming{background:#E9F4FE; color:#0B72C7;}
+  .type-Outgoing{background:#FDF2E6; color:#C2740C;}
+  .row-actions{display:flex; gap:6px;}
+  .icon-btn{
+    width:29px; height:29px; border-radius:8px; border:1px solid var(--border); background:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; font-size:13px; color:var(--text-soft); transition:.15s;
+  }
+  .icon-btn:hover{border-color:var(--blue); color:var(--blue); background:var(--blue-light);}
+  .icon-btn.danger:hover{border-color:var(--red); color:var(--red); background:var(--red-bg);}
+
+  /* Toolbar (search / sort / filter) */
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:16px;}
+  .search-box{
+    flex:1; min-width:220px; display:flex; align-items:center; gap:8px; background:#fff; border:1px solid var(--border);
+    border-radius:10px; padding:9px 13px;
+  }
+  .search-box input{border:none; outline:none; font-size:13px; width:100%; font-family:'Inter'; background:transparent;}
+  .search-box .ico{color:var(--text-faint); font-size:13px;}
+  select, .input, textarea{
+    border:1px solid var(--border); border-radius:10px; padding:9px 12px; font-size:13px; font-family:'Inter'; outline:none;
+    background:#fff; color:var(--text); width:100%;
+  }
+  select:focus, .input:focus{border-color:var(--blue); box-shadow:0 0 0 3px rgba(36,84,255,0.12);}
+  label{font-size:12px; font-weight:700; color:var(--text-soft); display:block; margin-bottom:6px;}
+  .field{margin-bottom:14px;}
+  .field-row{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+
+  /* Modal */
+  .overlay{
+    position:fixed; inset:0; background:rgba(11,18,32,0.5); backdrop-filter:blur(2px); display:none;
+    align-items:center; justify-content:center; z-index:100; padding:20px;
+  }
+  .overlay.active{display:flex;}
+  .modal{
+    background:#fff; border-radius:16px; width:420px; max-width:100%; padding:22px 22px 20px 22px;
+    box-shadow:0 24px 60px -12px rgba(15,23,42,.35); animation:pop .18s ease;
+  }
+  @keyframes pop{from{transform:scale(.96); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .modal-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;}
+  .modal-title{font-weight:800; font-size:16px;}
+  .modal-close{background:none; border:none; font-size:18px; color:var(--text-faint); cursor:pointer; line-height:1;}
+  .modal-foot{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
+  .hidden{display:none !important;}
+
+  /* Toast */
+  #toast-host{position:fixed; bottom:22px; right:22px; display:flex; flex-direction:column; gap:8px; z-index:200;}
+  .toast{
+    background:var(--navy); color:#fff; padding:11px 16px; border-radius:10px; font-size:12.5px; font-weight:600;
+    box-shadow:0 10px 26px -8px rgba(0,0,0,.4); display:flex; align-items:center; gap:8px; animation:toastIn .2s ease;
+    min-width:200px;
+  }
+  .toast.error{background:var(--red);}
+  .toast.success{background:var(--green);}
+  @keyframes toastIn{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+
+  .empty-state{text-align:center; padding:50px 20px; color:var(--text-faint);}
+  .empty-state .big-ico{font-size:34px; margin-bottom:10px;}
+  .empty-state .et{font-weight:700; color:var(--text-soft); font-size:14px; margin-bottom:4px;}
+
+  @media (max-width:980px){
+    .stats-grid{grid-template-columns:repeat(3,1fr);}
+    .two-col{grid-template-columns:1fr;}
+    .sidebar{width:76px; padding:18px 8px;}
+    .brand-text, .nav-item span.label, .nav-item .badge{display:none;}
+    .brand{justify-content:center; padding-bottom:16px;}
+    .nav-item{justify-content:center;}
+    .main{padding:20px;}
+  }
+  @media (max-width:640px){
+    .stats-grid{grid-template-columns:repeat(2,1fr);}
+    .field-row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">📞</div>
+      <div class="brand-text">CallDesk<span>Call Management System</span></div>
+    </div>
+
+    <nav class="nav">
+      <button class="nav-item active" data-section="dashboard">
+        <span class="ico">▦</span><span class="label">Dashboard</span>
+      </button>
+      <button class="nav-item" data-section="records">
+        <span class="ico">☰</span><span class="label">All Records</span><span class="badge" id="nav-count-records">0</span>
+      </button>
+      <button class="nav-item" data-section="queue">
+        <span class="ico">⧉</span><span class="label">Waiting Queue</span><span class="badge" id="nav-count-queue">0</span>
+      </button>
+      <button class="nav-item" data-section="history">
+        <span class="ico">⧗</span><span class="label">Call History</span><span class="badge" id="nav-count-history">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="sidebar-foot-btn" id="resetBtn">⟲ Reset all data</button>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+
+    <!-- ---------- DASHBOARD ---------- -->
+    <section class="section active" id="section-dashboard">
+      <div class="topbar">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <div class="page-sub">Live overview of incoming &amp; outgoing calls</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" onclick="openAddModal('Outgoing')">↗ Log Outgoing Call</button>
+          <button class="btn btn-primary" onclick="openAddModal('Incoming')">↙ New Incoming Call</button>
+        </div>
+      </div>
+
+      <div class="stats-grid" id="statsGrid"></div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-head">
+            <h3 class="section-title">Waiting Queue <span class="tag">Queue · FIFO</span></h3>
+            <button class="btn btn-soft btn-sm" onclick="answerNextCall()">☎ Answer next call</button>
+          </div>
+          <div class="panel-desc">Calls are answered strictly in the order they arrived — first in, first out.</div>
+          <div class="queue-track" id="queueTrack"></div>
+        </div>
+
+        <div class="panel">
+          <h3 class="section-title">Recent History <span class="tag">Stack · LIFO</span></h3>
+          <div class="panel-desc">Most recently completed call sits on top.</div>
+          <div class="stack-tower" id="stackTowerMini"></div>
+        </div>
+      </div>
+
+      <div class="panel" id="ongoingPanel">
+        <h3 class="section-title">Ongoing Calls</h3>
+        <div class="panel-desc">Calls currently being answered. End a call to record its outcome and duration.</div>
+        <div class="ongoing-list" id="ongoingList"></div>
+      </div>
+    </section>
+
+    <!-- ---------- ALL RECORDS ---------- -->
+    <section class="section" id="section-records">
+      <div class="topbar">
+        <div>
+          <h1 class="page-title">All Call Records</h1>
+          <div class="page-sub">Master linked list of every call ever logged</div>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" onclick="openAddModal('Outgoing')">↗ Log Outgoing Call</button>
+          <button class="btn btn-primary" onclick="openAddModal('Incoming')">↙ New Incoming Call</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="ico">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search by phone number or name…" oninput="renderRecordsTable()">
+        </div>
+        <select id="statusFilter" onchange="renderRecordsTable()" style="width:160px;">
+          <option value="All">All statuses</option>
+          <option value="Waiting">Waiting</option>
+          <option value="Ongoing">Ongoing</option>
+          <option value="Answered">Answered</option>
+          <option value="Missed">Missed</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+        <select id="sortKey" onchange="renderRecordsTable()" style="width:190px;">
+          <option value="">Sort by…</option>
+          <option value="duration">Duration (Merge Sort)</option>
+          <option value="dateTime">Date &amp; Time (Merge Sort)</option>
+        </select>
+      </div>
+
+      <div class="panel" style="padding:8px 0 4px 0;">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding-left:20px;">ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Type</th>
+                <th>Date &amp; Time</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th style="padding-right:20px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTableBody"></tbody>
+          </table>
+        </div>
+        <div id="recordsEmpty" class="table-empty hidden">No records match your search.</div>
+      </div>
+    </section>
+
+    <!-- ---------- WAITING QUEUE ---------- -->
+    <section class="section" id="section-queue">
+      <div class="topbar">
+        <div>
+          <h1 class="page-title">Waiting Queue</h1>
+          <div class="page-sub">Incoming calls waiting to be answered — First In, First Out</div>
+        </div>
+        <button class="btn btn-primary" onclick="answerNextCall()">☎ Answer next call</button>
+      </div>
+      <div class="panel">
+        <div class="queue-track" id="queueTrackFull" style="flex-wrap:wrap;"></div>
+      </div>
+    </section>
+
+    <!-- ---------- HISTORY ---------- -->
+    <section class="section" id="section-history">
+      <div class="topbar">
+        <div>
+          <h1 class="page-title">Call History</h1>
+          <div class="page-sub">Completed calls — most recently ended call shown first</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="padding-left:20px;">ID</th>
+                <th>Name</th>
+                <th>Phone</th>
+                <th>Type</th>
+                <th>Date &amp; Time</th>
+                <th>Duration</th>
+                <th style="padding-right:20px;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="historyTableBody"></tbody>
+          </table>
+        </div>
+        <div id="historyEmpty" class="table-empty hidden">No completed calls yet.</div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ============ MODAL: Add Incoming / Outgoing ============ -->
+<div class="overlay" id="addOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="addModalTitle">New Incoming Call</div>
+      <button class="modal-close" onclick="closeModal('addOverlay')">✕</button>
+    </div>
+    <form id="addForm" onsubmit="return handleAddSubmit(event)">
+      <input type="hidden" id="addCallType" value="Incoming">
+      <div class="field">
+        <label id="addNameLabel">Caller Name</label>
+        <input class="input" id="addName" required placeholder="e.g. Ravi Kumar">
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input class="input mono" id="addPhone" required placeholder="e.g. 9876543210" pattern="[0-9+\-\s]{7,15}">
+      </div>
+      <div class="field">
+        <label>Date &amp; Time</label>
+        <input class="input" type="datetime-local" id="addDateTime" required>
+      </div>
+
+      <div id="outgoingOutcomeFields" class="hidden">
+        <div class="field">
+          <label>Call Outcome</label>
+          <select id="addOutcome" onchange="toggleAddDurationField()">
+            <option value="Answered">Answered</option>
+            <option value="Missed">Missed</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="field" id="addDurationField">
+          <label>Duration (seconds)</label>
+          <input class="input mono" type="number" id="addDuration" min="1" value="60">
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeModal('addOverlay')">Cancel</button>
+        <button type="submit" class="btn btn-primary" id="addSubmitBtn">Add Incoming Call</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: End Call ============ -->
+<div class="overlay" id="endOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">End Call</div>
+      <button class="modal-close" onclick="closeModal('endOverlay')">✕</button>
+    </div>
+    <form id="endForm" onsubmit="return handleEndSubmit(event)">
+      <input type="hidden" id="endCallId">
+      <div class="field">
+        <label>Outcome</label>
+        <select id="endOutcome" onchange="toggleEndDurationField()">
+          <option value="Answered">Answered</option>
+          <option value="Missed">Missed</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
+      <div class="field" id="endDurationField">
+        <label>Duration (seconds)</label>
+        <input class="input mono" type="number" id="endDuration" min="1" value="60">
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeModal('endOverlay')">Cancel</button>
+        <button type="submit" class="btn btn-primary">End &amp; Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ============ MODAL: Update Record ============ -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Update Call Record</div>
+      <button class="modal-close" onclick="closeModal('editOverlay')">✕</button>
+    </div>
+    <form id="editForm" onsubmit="return handleEditSubmit(event)">
+      <input type="hidden" id="editCallId">
+      <div class="field">
+        <label>Name</label>
+        <input class="input" id="editName" required>
+      </div>
+      <div class="field">
+        <label>Phone Number</label>
+        <input class="input mono" id="editPhone" required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Status</label>
+          <select id="editStatus">
+            <option value="Waiting">Waiting</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Answered">Answered</option>
+            <option value="Missed">Missed</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Duration (sec)</label>
+          <input class="input mono" type="number" id="editDuration" min="0">
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn btn-outline" onclick="closeModal('editOverlay')">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="toast-host"></div>
+
+<script>
+/* =====================================================================================
+   CALL MANAGEMENT SYSTEM — client-side data structures
+   Data lives only in memory for this browser tab (resets on refresh), exactly like
+   the console version of this project: no backend, no database.
+   ===================================================================================== */
+
+/* ---------------------------------------------------------------------------
+   1. CALL RECORD — node of the master Linked List
+   --------------------------------------------------------------------------- */
+class CallRecord {
+  constructor(id, name, phone, type, dateTime) {
+    this.id = id;
+    this.name = name;
+    this.phone = phone;
+    this.type = type;          // "Incoming" | "Outgoing"
+    this.dateTime = dateTime;  // "YYYY-MM-DDTHH:MM"
+    this.duration = 0;         // seconds
+    this.status = "Waiting";   // Waiting | Ongoing | Answered | Missed | Rejected
+    this.next = null;          // linked-list pointer
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   2. LINKED LIST — master storage of every call record ever logged
+   --------------------------------------------------------------------------- */
+class CallLinkedList {
+  constructor() { this.head = null; this.size = 0; }
+
+  append(record) {                       // O(n) — walks to the tail
+    record.next = null;
+    if (!this.head) { this.head = record; }
+    else {
+      let t = this.head;
+      while (t.next) t = t.next;
+      t.next = record;
+    }
+    this.size++;
+  }
+
+  toArray() {                            // O(n)
+    const arr = [];
+    let t = this.head;
+    while (t) { arr.push(t); t = t.next; }
+    return arr;
+  }
+
+  findById(id) {                         // O(n)
+    let t = this.head;
+    while (t) { if (t.id === id) return t; t = t.next; }
+    return null;
+  }
+
+  removeById(id) {                       // O(n)
+    let prev = null, curr = this.head;
+    while (curr) {
+      if (curr.id === id) {
+        if (prev) prev.next = curr.next; else this.head = curr.next;
+        this.size--;
+        return curr;
+      }
+      prev = curr; curr = curr.next;
+    }
+    return null;
+  }
+
+  /* ---- Merge Sort on the linked list (stable, O(n log n)) ---- */
+  sortBy(key) { this.head = this._mergeSort(this.head, key); this.size = this.toArray().length; }
+
+  _mergeSort(head, key) {
+    if (!head || !head.next) return head;
+    const { front, back } = this._split(head);
+    const a = this._mergeSort(front, key);
+    const b = this._mergeSort(back, key);
+    return this._merge(a, b, key);
+  }
+
+  _split(source) {
+    let slow = source, fast = source.next;
+    while (fast) { fast = fast.next; if (fast) { slow = slow.next; fast = fast.next; } }
+    const back = slow.next;
+    slow.next = null;
+    return { front: source, back };
+  }
+
+  _merge(a, b, key) {
+    if (!a) return b;
+    if (!b) return a;
+    const aFirst = key === "duration" ? a.duration <= b.duration : a.dateTime <= b.dateTime;
+    if (aFirst) { a.next = this._merge(a.next, b, key); return a; }
+    else { b.next = this._merge(a, b.next, key); return b; }
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   3. QUEUE — waiting incoming calls, FIFO (own linked list of pointers)
+   --------------------------------------------------------------------------- */
+class CallQueue {
+  constructor() { this.front = null; this.rear = null; this.count = 0; }
+
+  enqueue(call) {                        // O(1)
+    const node = { call, next: null };
+    if (!this.front) { this.front = this.rear = node; }
+    else { this.rear.next = node; this.rear = node; }
+    this.count++;
+  }
+
+  dequeue() {                            // O(1)
+    if (!this.front) return null;
+    const node = this.front;
+    this.front = this.front.next;
+    if (!this.front) this.rear = null;
+    this.count--;
+    return node.call;
+  }
+
+  removeByPhone(phone) {                 // O(n) — used when a waiting record is deleted
+    let prev = null, curr = this.front;
+    while (curr) {
+      if (curr.call.phone === phone) {
+        if (prev) prev.next = curr.next; else this.front = curr.next;
+        if (curr === this.rear) this.rear = prev;
+        this.count--;
+        return;
+      }
+      prev = curr; curr = curr.next;
+    }
+  }
+
+  toArray() {                            // O(n)
+    const arr = [];
+    let t = this.front;
+    while (t) { arr.push(t.call); t = t.next; }
+    return arr;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   4. STACK — recent call history, LIFO (own linked list of pointers)
+   --------------------------------------------------------------------------- */
+class CallStack {
+  constructor() { this.top = null; this.count = 0; }
+
+  push(call) {                           // O(1)
+    const node = { call, next: this.top };
+    this.top = node;
+    this.count++;
+  }
+
+  toArray() {                            // O(n) — top (most recent) first
+    const arr = [];
+    let t = this.top;
+    while (t) { arr.push(t.call); t = t.next; }
+    return arr;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   SYSTEM STATE
+   --------------------------------------------------------------------------- */
+const masterList = new CallLinkedList();
+const waitingQueue = new CallQueue();
+const historyStack = new CallStack();
+let nextId = 1;
+
+/* ---------------------------------------------------------------------------
+   UTILITIES
+   --------------------------------------------------------------------------- */
+function pad(n) { return n.toString().padStart(2, "0"); }
+
+function nowLocalInputValue() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatDateTime(dt) {
+  if (!dt) return "—";
+  const d = new Date(dt);
+  if (isNaN(d)) return dt;
+  const options = { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" };
+  return d.toLocaleString(undefined, options);
+}
+
+function formatDuration(sec) {
+  if (!sec) return "—";
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return `${m}m ${pad(s)}s`;
+}
+
+function toast(msg, type = "") {
+  const host = document.getElementById("toast-host");
+  const el = document.createElement("div");
+  el.className = "toast" + (type ? " " + type : "");
+  el.textContent = msg;
+  host.appendChild(el);
+  setTimeout(() => el.remove(), 2800);
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+/* ---------------------------------------------------------------------------
+   NAVIGATION
+   --------------------------------------------------------------------------- */
+document.querySelectorAll(".nav-item[data-section]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+    btn.classList.add("active");
+    document.getElementById("section-" + btn.dataset.section).classList.add("active");
+  });
+});
+
+/* ---------------------------------------------------------------------------
+   MODALS
+   --------------------------------------------------------------------------- */
+function openModal(id) { document.getElementById(id).classList.add("active"); }
+function closeModal(id) { document.getElementById(id).classList.remove("active"); }
+document.querySelectorAll(".overlay").forEach(ov => {
+  ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("active"); });
+});
+
+/* ---- Add Call modal ---- */
+function openAddModal(type) {
+  document.getElementById("addForm").reset();
+  document.getElementById("addCallType").value = type;
+  document.getElementById("addDateTime").value = nowLocalInputValue();
+  document.getElementById("addModalTitle").textContent = type === "Incoming" ? "New Incoming Call" : "Log Outgoing Call";
+  document.getElementById("addNameLabel").textContent = type === "Incoming" ? "Caller Name" : "Receiver Name";
+  document.getElementById("addSubmitBtn").textContent = type === "Incoming" ? "Add Incoming Call" : "Save Outgoing Call";
+  document.getElementById("outgoingOutcomeFields").classList.toggle("hidden", type !== "Outgoing");
+  toggleAddDurationField();
+  openModal("addOverlay");
+}
+function toggleAddDurationField() {
+  const isAnswered = document.getElementById("addOutcome").value === "Answered";
+  document.getElementById("addDurationField").classList.toggle("hidden", !isAnswered);
+}
+function toggleEndDurationField() {
+  const isAnswered = document.getElementById("endOutcome").value === "Answered";
+  document.getElementById("endDurationField").classList.toggle("hidden", !isAnswered);
+}
+
+function handleAddSubmit(e) {
+  e.preventDefault();
+  const type = document.getElementById("addCallType").value;
+  const name = document.getElementById("addName").value.trim();
+  const phone = document.getElementById("addPhone").value.trim();
+  const dateTime = document.getElementById("addDateTime").value;
+
+  const record = new CallRecord(nextId++, name, phone, type, dateTime);
+
+  if (type === "Incoming") {
+    record.status = "Waiting";
+    masterList.append(record);
+    waitingQueue.enqueue(record);
+    toast(`Incoming call from ${name} added to the waiting queue.`, "success");
+  } else {
+    const outcome = document.getElementById("addOutcome").value;
+    record.status = outcome;
+    if (outcome === "Answered") record.duration = parseInt(document.getElementById("addDuration").value, 10) || 0;
+    masterList.append(record);
+    historyStack.push(record);
+    toast(`Outgoing call to ${name} logged as ${outcome}.`, "success");
+  }
+
+  closeModal("addOverlay");
+  renderAll();
+  return false;
+}
+
+/* ---- End Call modal ---- */
+function openEndModal(id) {
+  document.getElementById("endForm").reset();
+  document.getElementById("endCallId").value = id;
+  toggleEndDurationField();
+  openModal("endOverlay");
+}
+function handleEndSubmit(e) {
+  e.preventDefault();
+  const id = parseInt(document.getElementById("endCallId").value, 10);
+  const rec = masterList.findById(id);
+  if (!rec) { toast("Record not found.", "error"); return false; }
+
+  const outcome = document.getElementById("endOutcome").value;
+  rec.status = outcome;
+  rec.duration = outcome === "Answered" ? (parseInt(document.getElementById("endDuration").value, 10) || 0) : 0;
+  historyStack.push(rec);
+
+  closeModal("endOverlay");
+  toast(`Call with ${rec.name} ended — marked ${outcome}.`, "success");
+  renderAll();
+  return false;
+}
+
+/* ---- Edit / Update modal ---- */
+function openEditModal(id) {
+  const rec = masterList.findById(id);
+  if (!rec) return;
+  document.getElementById("editCallId").value = rec.id;
+  document.getElementById("editName").value = rec.name;
+  document.getElementById("editPhone").value = rec.phone;
+  document.getElementById("editStatus").value = rec.status;
+  document.getElementById("editDuration").value = rec.duration;
+  openModal("editOverlay");
+}
+function handleEditSubmit(e) {
+  e.preventDefault();
+  const id = parseInt(document.getElementById("editCallId").value, 10);
+  const rec = masterList.findById(id);
+  if (!rec) { toast("Record not found.", "error"); return false; }
+
+  const oldStatus = rec.status;
+  const oldPhone = rec.phone;
+
+  rec.name = document.getElementById("editName").value.trim();
+  rec.phone = document.getElementById("editPhone").value.trim();
+  rec.status = document.getElementById("editStatus").value;
+  rec.duration = parseInt(document.getElementById("editDuration").value, 10) || 0;
+
+  // Keep the Queue in sync: if it left "Waiting" or its phone number changed, drop the stale queue entry.
+  if (oldStatus === "Waiting" && rec.status !== "Waiting") {
+    waitingQueue.removeByPhone(oldPhone);
+  } else if (oldStatus === "Waiting" && rec.status === "Waiting" && oldPhone !== rec.phone) {
+    waitingQueue.removeByPhone(oldPhone);
+    waitingQueue.enqueue(rec);
+  }
+
+  closeModal("editOverlay");
+  toast(`Record for ${rec.name} updated.`, "success");
+  renderAll();
+  return false;
+}
+
+/* ---------------------------------------------------------------------------
+   CORE ACTIONS
+   --------------------------------------------------------------------------- */
+function answerNextCall() {
+  const rec = waitingQueue.dequeue();
+  if (!rec) { toast("No calls are waiting.", "error"); return; }
+  rec.status = "Ongoing";
+  toast(`Now talking to ${rec.name}. Use "End Call" to finish.`, "success");
+  renderAll();
+}
+
+function deleteRecord(id) {
+  const rec = masterList.findById(id);
+  if (!rec) return;
+  if (!confirm(`Delete the call record for ${rec.name} (${rec.phone})? This cannot be undone.`)) return;
+  waitingQueue.removeByPhone(rec.phone);
+  masterList.removeById(id);
+  toast(`Record for ${rec.name} deleted.`, "success");
+  renderAll();
+}
+
+function resetSystem() {
+  if (!confirm("Reset all call data? This clears every record, the waiting queue and the history.")) return;
+  masterList.head = null; masterList.size = 0;
+  waitingQueue.front = null; waitingQueue.rear = null; waitingQueue.count = 0;
+  historyStack.top = null; historyStack.count = 0;
+  nextId = 1;
+  toast("All data has been reset.", "success");
+  renderAll();
+}
+document.getElementById("resetBtn").addEventListener("click", resetSystem);
+
+/* ---------------------------------------------------------------------------
+   RENDERING
+   --------------------------------------------------------------------------- */
+function computeStats() {
+  const all = masterList.toArray();
+  const s = { total: all.length, waiting: 0, ongoing: 0, answered: 0, missed: 0, rejected: 0, totalDuration: 0 };
+  all.forEach(r => {
+    if (r.status === "Waiting") s.waiting++;
+    else if (r.status === "Ongoing") s.ongoing++;
+    else if (r.status === "Answered") { s.answered++; s.totalDuration += r.duration; }
+    else if (r.status === "Missed") s.missed++;
+    else if (r.status === "Rejected") s.rejected++;
+  });
+  s.avgDuration = s.answered ? Math.round(s.totalDuration / s.answered) : 0;
+  return s;
+}
+
+function renderStats() {
+  const s = computeStats();
+  const cards = [
+    { label: "Total Calls", value: s.total, cls: "accent-blue" },
+    { label: "Waiting", value: s.waiting, cls: "accent-blue" },
+    { label: "Ongoing", value: s.ongoing, cls: "accent-violet" },
+    { label: "Answered", value: s.answered, cls: "accent-green" },
+    { label: "Missed / Rejected", value: s.missed + s.rejected, cls: "accent-amber" },
+    { label: "Total Talk Time", value: formatDuration(s.totalDuration), cls: "accent-blue" },
+  ];
+  document.getElementById("statsGrid").innerHTML = cards.map(c => `
+    <div class="stat-card ${c.cls}">
+      <div class="stat-label">${c.label}</div>
+      <div class="stat-value">${c.value}</div>
+    </div>`).join("");
+}
+
+function queueChipHtml(call, pos) {
+  return `
+    <div class="queue-chip">
+      <div class="qc-pos">${pos}</div>
+      <div class="qc-name">${escapeHtml(call.name)}</div>
+      <div class="qc-phone">${escapeHtml(call.phone)}</div>
+    </div>`;
+}
+
+function renderQueue() {
+  const items = waitingQueue.toArray();
+  document.getElementById("nav-count-queue").textContent = items.length;
+
+  const mkTrack = () => {
+    if (!items.length) return `<div class="queue-empty">No calls are currently waiting.</div>`;
+    return items.map((call, i) =>
+      queueChipHtml(call, i + 1) + (i < items.length - 1 ? `<div class="queue-arrow">→</div>` : "")
+    ).join("");
+  };
+  document.getElementById("queueTrack").innerHTML = mkTrack();
+  document.getElementById("queueTrackFull").innerHTML = mkTrack();
+}
+
+function renderStack() {
+  const items = historyStack.toArray().slice(0, 6);
+  document.getElementById("nav-count-history").textContent = historyStack.toArray().length;
+
+  const mini = document.getElementById("stackTowerMini");
+  if (!items.length) {
+    mini.innerHTML = `<div class="stack-empty">No completed calls yet.</div>`;
+  } else {
+    // column-reverse container -> append in normal order so the first item (most recent) renders on top
+    mini.innerHTML = items.map(call => `
+      <div class="stack-card">
+        <div class="sc-info">
+          <div class="sc-name">${escapeHtml(call.name)} <span class="mono" style="color:var(--text-faint); font-size:10.5px;">#${call.id}</span></div>
+          <div class="sc-meta">${escapeHtml(call.phone)} · ${formatDuration(call.duration)}</div>
+        </div>
+        <span class="status-pill status-${call.status}">${call.status}</span>
+      </div>`).join("");
+  }
+
+  const tbody = document.getElementById("historyTableBody");
+  const full = historyStack.toArray();
+  document.getElementById("historyEmpty").classList.toggle("hidden", full.length !== 0);
+  tbody.innerHTML = full.map(call => `
+    <tr>
+      <td class="mono-cell" style="padding-left:20px;">#${call.id}</td>
+      <td class="name-cell">${escapeHtml(call.name)}</td>
+      <td class="mono-cell">${escapeHtml(call.phone)}</td>
+      <td><span class="type-pill type-${call.type}">${call.type}</span></td>
+      <td class="mono-cell">${formatDateTime(call.dateTime)}</td>
+      <td class="mono-cell">${formatDuration(call.duration)}</td>
+      <td style="padding-right:20px;"><span class="status-pill status-${call.status}">${call.status}</span></td>
+    </tr>`).join("");
+}
+
+function renderOngoing() {
+  const ongoing = masterList.toArray().filter(r => r.status === "Ongoing");
+  const panel = document.getElementById("ongoingPanel");
+  const list = document.getElementById("ongoingList");
+  if (!ongoing.length) {
+    panel.style.display = "none";
+    return;
+  }
+  panel.style.display = "block";
+  list.innerHTML = ongoing.map(call => `
+    <div class="ongoing-card">
+      <div class="ongoing-left">
+        <span class="pulse-dot"></span>
+        <div>
+          <div class="ongoing-name">${escapeHtml(call.name)}</div>
+          <div class="ongoing-meta">${escapeHtml(call.phone)} · ${call.type}</div>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="openEndModal(${call.id})">End Call</button>
+    </div>`).join("");
+}
+
+function renderRecordsTable() {
+  const query = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+  const statusFilter = document.getElementById("statusFilter").value;
+  const sortKey = document.getElementById("sortKey").value;
+
+  if (sortKey) masterList.sortBy(sortKey);
+
+  let records = masterList.toArray();
+  document.getElementById("nav-count-records").textContent = records.length;
+
+  if (query) {
+    records = records.filter(r =>
+      r.phone.toLowerCase().includes(query) || r.name.toLowerCase().includes(query)
+    );
+  }
+  if (statusFilter !== "All") {
+    records = records.filter(r => r.status === statusFilter);
+  }
+
+  const tbody = document.getElementById("recordsTableBody");
+  document.getElementById("recordsEmpty").classList.toggle("hidden", records.length !== 0 || masterList.size === 0);
+
+  if (!masterList.size) {
+    tbody.innerHTML = "";
+    document.getElementById("recordsEmpty").classList.remove("hidden");
+    document.getElementById("recordsEmpty").textContent = "No call records yet — add an incoming or outgoing call to get started.";
+    return;
+  }
+  if (!records.length) {
+    tbody.innerHTML = "";
+    document.getElementById("recordsEmpty").classList.remove("hidden");
+    document.getElementById("recordsEmpty").textContent = "No records match your search or filter.";
+    return;
+  }
+
+  tbody.innerHTML = records.map(r => `
+    <tr>
+      <td class="mono-cell" style="padding-left:20px;">#${r.id}</td>
+      <td class="name-cell">${escapeHtml(r.name)}</td>
+      <td class="mono-cell">${escapeHtml(r.phone)}</td>
+      <td><span class="type-pill type-${r.type}">${r.type}</span></td>
+      <td class="mono-cell">${formatDateTime(r.dateTime)}</td>
+      <td class="mono-cell">${formatDuration(r.duration)}</td>
+      <td><span class="status-pill status-${r.status}">${r.status}</span></td>
+      <td style="padding-right:20px;">
+        <div class="row-actions">
+          ${r.status === "Waiting" ? `<button class="icon-btn" title="Answer this call" onclick="answerSpecific(${r.id})">☎</button>` : ""}
+          ${r.status === "Ongoing" ? `<button class="icon-btn" title="End call" onclick="openEndModal(${r.id})">■</button>` : ""}
+          <button class="icon-btn" title="Edit record" onclick="openEditModal(${r.id})">✎</button>
+          <button class="icon-btn danger" title="Delete record" onclick="deleteRecord(${r.id})">🗑</button>
+        </div>
+      </td>
+    </tr>`).join("");
+}
+
+function answerSpecific(id) {
+  const rec = masterList.findById(id);
+  if (!rec || rec.status !== "Waiting") return;
+  waitingQueue.removeByPhone(rec.phone);
+  rec.status = "Ongoing";
+  toast(`Now talking to ${rec.name}.`, "success");
+  renderAll();
+}
+
+function renderAll() {
+  renderStats();
+  renderQueue();
+  renderStack();
+  renderOngoing();
+  renderRecordsTable();
+}
+
+/* ---------------------------------------------------------------------------
+   SEED DATA — a few sample records so the dashboard isn't empty on first load
+   --------------------------------------------------------------------------- */
+(function seed() {
+  const today = new Date();
+  const at = (h, m) => { const d = new Date(today); d.setHours(h, m, 0, 0); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(h)}:${pad(m)}`; };
+
+  const r1 = new CallRecord(nextId++, "Ravi Kumar", "9876543210", "Incoming", at(9, 5));
+  masterList.append(r1); waitingQueue.enqueue(r1);
+
+  const r2 = new CallRecord(nextId++, "Anita Sharma", "9123456780", "Incoming", at(9, 20));
+  masterList.append(r2); waitingQueue.enqueue(r2);
+
+  const r3 = new CallRecord(nextId++, "Suresh Babu", "9988776655", "Outgoing", at(9, 30));
+  r3.status = "Answered"; r3.duration = 145;
+  masterList.append(r3); historyStack.push(r3);
+
+  const r4 = new CallRecord(nextId++, "Kavya Reddy", "9012345678", "Outgoing", at(9, 40));
+  r4.status = "Missed";
+  masterList.append(r4); historyStack.push(r4);
+
+  renderAll();
+})();
+</script>
+</body>
+</html>
